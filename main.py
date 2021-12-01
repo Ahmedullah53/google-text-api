@@ -16,8 +16,9 @@ def test():
 @app.post('/translate/')
 async def translate(request: Request):
     req = await request.json()
+    print(req)
     try:
-        if type(req.get('text')) == 'str':
+        if type(req.get('text')) == str:
             return { 
                 'original_text': req.get('text'),
                 'translated_text': helper.translate(req.get('text')) 
@@ -35,12 +36,17 @@ async def translate(request: Request):
 @app.post('/spellcheck/')
 async def spellcheck(request: Request):
     req = await request.json()
+    txtBlb = TextBlob(req.get('text'))
     try:
-        textBlb = TextBlob(req.get('text'))
-        return {
-            'orignal_text': req.get('text'),
-            'correct_text': str(textBlb.correct())
-        }
+        if type(req.get('text')) == str:
+            return { 
+                'original_text': req.get('text'),
+                'correct_text': str(txtBlb.correct()) 
+            }
+        else:
+            return {
+                'msg': 'text must be a string'
+            }
     except Exception as e:
         msg = 'missing text parameter' if bool(e) else e
         return {
