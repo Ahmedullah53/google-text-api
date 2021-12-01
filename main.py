@@ -1,6 +1,7 @@
 from fastapi import Request, FastAPI, status
 from pydantic import BaseModel
 from automation import helper
+from textblob import TextBlob
 import json
 import os 
 
@@ -25,6 +26,21 @@ async def translate(request: Request):
             return {
                 'msg': 'text must be a string'
             }
+    except Exception as e:
+        msg = 'missing text parameter' if bool(e) else e
+        return {
+            'msg': msg
+        }
+
+@app.post('/spellcheck/')
+async def spellcheck(request: Request):
+    req = await request.json()
+    try:
+        textBlb = TextBlob(req.get('text'))
+        return {
+            'orignal_text': req.get('text'),
+            'correct_text': str(textBlb.correct())
+        }
     except Exception as e:
         msg = 'missing text parameter' if bool(e) else e
         return {
